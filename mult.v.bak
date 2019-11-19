@@ -1,0 +1,84 @@
+// Name: mult.v
+// Module: MULT32 , MULT32_U
+//
+// Output: HI: 32 higher bits
+//         LO: 32 lower bits
+//         
+//
+// Input: A : 32-bit input
+//        B : 32-bit input
+//
+// Notes: 32-bit multiplication
+// 
+//
+// Revision History:
+//
+// Version	Date		Who		email			note
+//------------------------------------------------------------------------------------------
+//  1.0     Sep 10, 2014	Kaushik Patra	kpatra@sjsu.edu		Initial creation
+//------------------------------------------------------------------------------------------
+`include "prj_definition.v"
+
+module MULT32(HI, LO, A, B);
+// output list
+output [31:0] HI;
+output [31:0] LO;
+// input list
+input [31:0] A;
+input [31:0] B;
+
+wire [31:0] mcnd_not, mplr_not, mcnd_mux, mplr_mux, lo_not, hi_not, hi_temp, lo_temp;
+wire mux_end;
+wire [63:0] result_64; 
+
+TWOSCOMP32 mcnd(mcnd_not, A);
+TWOSCOMP32 mplr(mplr_not, B);
+MUX32_2x1 mcnd_choice(mcnd_mux, A, mcnd_not, A[31]);
+MUX32_2x1 mplr_choice(mplr_mux, B, mplr_not, B[31]);
+
+MULT32_U mult(hi_temp, lo_temp, mcnd_mux, mplr_mux);
+/*TWOSCOMP32 LO_comp(lo_not, lo_temp);
+TWOSCOMP32 HI_comp(hi_not, hi_temp);*/
+TWOSCOMP64 comp_result(result_64, {hi_temp, lo_temp});
+xor mux_result(mux_end, A[31], B[31]);
+MUX32_2x1 lo_result(LO, lo_temp, comp_result[31:0], mux_end);
+MUX32_2x1 hi_result(HI, hi_temp, comp_result[63:32], mux_end);
+endmodule
+
+module MULT32_U(HI, LO, A, B);
+// output list
+output [31:0] HI;
+output [31:0] LO;
+// input list
+input [31:0] A;
+input [31:0] B;
+
+wire[31:0] second_and;
+wire[31:0] alu_result[31:0];
+wire[31:0] CO;
+
+genvar i;
+generate
+for(i=1; i<32; i=i+1)
+begin : multi_gen_loop
+  wire[31:0] first_and;
+  if(i == 1) 
+  begin
+    AND32_2x1 a1(first_and, A, {32{B[0]}});
+    AND32_2x1 a2(second_and, A, {32{B[1]}});
+    RC_ADD_SUB_32 adder(alu_result[0], CO[0], {1'b0,first_and[31:1]}, second_and, 1'b0);
+    buf b(LO[0], first_and[0]);
+    buf b2(LO[1], alu_result[0][0]);
+    assign alu_result[1] = alu_result[0];
+    assign CO[1] = CO[0];
+  end
+  else
+  begin
+    AND32_2x1 a3(first_and, A, {32{B[i]}});
+    RC_ADD_SUB_32 adder(alu_result[i], CO[i], first_and, {CO[i-1],alu_result[i-1][31:1]}, 1'b0);
+    buf b(LO[i], alu_result[i][0]);
+  end 
+end
+assign HI = {CO[31], alu_result[31][31:1]};
+endgenerate
+endmodule
