@@ -34,7 +34,7 @@ output ZERO;
 //wires
 wire SnA, CO;
 wire oprn_not, oprn_and;
-wire [31:0] rc_output, mult_hi, mult_lo, shift_output, and_output, or_output, nor_output;
+wire [31:0] rc_output, mult_hi, mult_lo, shift_output, and_output, or_output, nor_output, result;
 wire [31:0] I = 32'b0;
 
 //addition operation
@@ -59,8 +59,9 @@ OR32_2x1 or_op(or_output, OP1, OP2);
 NOR32_2x1 nor_op(nor_output, OP1, OP2);
 
 //multiplexer to pick the result
-MUX32_16x1 final_result(OUT, I, rc_output, rc_output, mult_lo, shift_output, shift_output, and_output, or_output,
+MUX32_16x1 final_result(result, I, rc_output, rc_output, mult_lo, shift_output, shift_output, and_output, or_output,
                      nor_output, {31'b0, rc_output[31]}, I, I, I, I, I, I, OPRN[3:0]);
 
-nor nor_zero(ZERO, OUT);
+NOR2x1 nor_zero(ZERO, result);
+assign OUT = result;
 endmodule
