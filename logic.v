@@ -94,8 +94,11 @@ input D, C;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire master_output, master_bar, not_clock;
 
+D_LATCH dl(master_output, master_bar, D, C, nP, nR);
+not inv_c(not_clock, C);
+SR_LATCH srl(Q,Qbar, master_output, master_bar, not_clock, nP, nR);
 endmodule
 
 // 1 bit D latch
@@ -107,8 +110,16 @@ input D, C;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire nand_1_result, nand_2_result, nand_3_result, nand_4_result, not_d;
 
+not inv_d(not_d, D);
+nand nand_1(nand_1_result, D, C);
+nand nand_2(nand_2_result, C, not_d);
+nand nand_3(nand_3_result, nand_1_result, nand_4_result, nP);
+nand nand_4(nand_4_result, nand_2_result, nand_3_result, nR);
+
+assign Q = nand_3_result;
+assign Qbar = nand_4_result;
 endmodule
 
 // 1 bit SR latch
@@ -120,8 +131,15 @@ input S, R, C;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire nand_1_result, nand_2_result, nand_3_result, nand_4_result;
 
+nand nand_1(nand_1_result, S, C);
+nand nand_2(nand_2_result, R, C);
+nand nand_3(nand_3_result, nand_1_result, nand_4_result, nP);
+nand nand_4(nand_4_result, nand_2_result, nand_3_result, nR);
+
+assign Q = nand_3_result;
+assign Qbar = nand_4_result;
 endmodule
 
 // 5x32 Line decoder
