@@ -81,8 +81,11 @@ input D, C, L;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire mux_result, Q_out;
 
+MUX1_2x1 load(mux_result, Q_out, D, L);
+D_FF flipflop(Q_out, Qbar, mux_result, C, nP, nR);
+assign Q = Q_out;
 endmodule
 
 // 1 bit flipflop +ve edge, 
