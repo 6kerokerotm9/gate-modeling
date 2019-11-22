@@ -68,8 +68,15 @@ input CLK, LOAD;
 input [31:0] D;
 input RESET;
 
-// TBD
+wire [31:0] Qbar;
 
+genvar i;
+generate
+for(i=0; i<32; i=i+1)
+begin : reg32_loop
+  REG1 register(Q[i], Qbar[i], D[i], LOAD, CLK, 1'b1, RESET);
+end
+endgenerate
 endmodule
 
 // 1 bit register +ve edge, 
