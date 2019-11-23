@@ -159,8 +159,24 @@ output [31:0] D;
 // input
 input [4:0] I;
 
-// TBD
+wire I_not4;
+wire [15:0] output_4x16; 
 
+not inv(I_not4, I[4]);
+DECODER_4x16 decoder(output_4x16, I[3:0]);
+genvar i;
+generate
+for(i = 0; i < 16; i = i + 1)
+begin 
+  and(D[i], output_4x16[i], I_not4);
+end
+endgenerate
+generate
+for(i = 0; i < 16; i = i + 1)
+begin
+  and(D[i+16], output_4x16[i], I[4]);
+end
+endgenerate
 endmodule
 
 // 4x16 Line decoder
@@ -170,9 +186,24 @@ output [15:0] D;
 // input
 input [3:0] I;
 
-// TBD
+wire I_not3;
+wire [7:0] output_3x8;  
 
-
+not inv(I_not3, I[3]);
+DECODER_3x8 decoder(output_3x8, I[2:0]);
+genvar i;
+generate
+for(i = 0; i < 8; i = i + 1)
+begin 
+  and(D[i], output_3x8[i], I_not3);
+end
+endgenerate
+generate
+for(i = 0; i < 8; i = i + 1)
+begin
+  and(D[i+8], output_3x8[i], I[3]);
+end
+endgenerate
 endmodule
 
 // 3x8 Line decoder
@@ -182,9 +213,19 @@ output [7:0] D;
 // input
 input [2:0] I;
 
-//TBD
+wire I_not2;
+wire [3:0] output_2x4;
 
-
+not inv(I_not2, I[2]);
+DECODER_2x4 decoder(output_2x4, I[1:0]);
+and and0(D[0], output_2x4[0], I_not2);
+and and1(D[1], output_2x4[1], I_not2);
+and and2(D[2], output_2x4[2], I_not2);
+and and3(D[3], output_2x4[3], I_not2);
+and and4(D[4], output_2x4[0], I[2]);
+and and5(D[5], output_2x4[1], I[2]);
+and and6(D[6], output_2x4[2], I[2]);
+and and7(D[7], output_2x4[3], I[2]);
 endmodule
 
 // 2x4 Line decoder
@@ -194,6 +235,13 @@ output [3:0] D;
 // input
 input [1:0] I;
 
-// TBD
+wire I_not1, I_not0;
 
-endmodule
+not inv1(I_not1, I[1]);
+not inv0(I_not0, I[0]);
+
+and and0(D[0], I_not1, I_not0);
+and and1(D[1], I_not1, I[0]);
+and and2(D[2], I[1], I_not0);
+and and3(D[3], I[1], I[0]);
+endmodule;
