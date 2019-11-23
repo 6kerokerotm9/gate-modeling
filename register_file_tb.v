@@ -66,7 +66,7 @@ begin
 #10     DATA_REG=i; READ=1'b0; WRITE=1'b1; ADDR_W = i;
 end
 
-#5 READ=1'b0; WRITE=1'b0;
+#10 READ=1'b0; WRITE=1'b0;
 // test of write data
 for(i=0;i<32; i = i + 1)
 begin
