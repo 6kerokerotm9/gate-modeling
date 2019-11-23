@@ -43,7 +43,9 @@ output [`DATA_INDEX_LIMIT:0] DATA_R2;
 
 wire [31:0] D, L, mux_r1_result, mux_r2_result;
 wire [31:0] Q[31:0];
-wire RESET;
+/*wire RESET;
+
+not inv_rst(RESET, RST);*/
 
 DECODER_5x32 decoder(D,ADDR_W);
 genvar i;
@@ -69,6 +71,6 @@ MUX32_32x1 mux_read_2(mux_r2_result, Q[0], Q[1], Q[2], Q[3], Q[4], Q[5], Q[6], Q
 	Q[10], Q[11], Q[12], Q[13], Q[14], Q[15], Q[16], Q[17], Q[18], Q[19], Q[20], Q[21], Q[22], Q[23], Q[24],
 	Q[25], Q[26], Q[27], Q[28], Q[29], Q[30], Q[31], ADDR_R2);
 
-MUX32_2x1 mux_out_1(DATA_R1, mux_r1_result, 32'bZ, READ);
-MUX32_2x1 mux_out_2(DATA_R2, mux_r2_result, 32'bZ, READ);  
+MUX32_2x1 mux_out_1(DATA_R1, 32'bZ, mux_r1_result, READ);
+MUX32_2x1 mux_out_2(DATA_R2, 32'bZ, mux_r2_result, READ);  
 endmodule
